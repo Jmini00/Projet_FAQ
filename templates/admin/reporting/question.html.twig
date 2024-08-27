@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reporting questions{% endblock %}
+
+{% block body %}
+    <h1>Questions ayant plus de 6 réponses</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Question</th>
+            <th scope="col">Auteur</th>
+            <th scope="col">Date de création</th>
+            <th scope="col">...</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for question in questions %}
+                <tr>
+                    <td>{{ question.titre }}</td>
+                    <td>{{ question.user.nom }}</td>
+                    <td>{{ question.dateCreation|date('d.m.Y') }}</td>
+                    <td>
+                        <a href="{{ path('app_home_reponses', { id: question.id }) }}">
+                            Voir la question
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+

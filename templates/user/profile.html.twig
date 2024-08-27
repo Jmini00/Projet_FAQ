@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modification du profil{% endblock %}
+
+{% block body %}
+	<div class="w-50 mx-auto">
+		<div class="text-center my-4">
+			<h1>Modification de votre profil</h1>
+		</div>
+    <div class="my-5">
+
+		{{ form(formProfile) }}
+		{#  <a 
+		href="{{ path('app_user_delete') }}"
+		class="btn btn-danger"
+		onclick="return confirm('Etes-vous sûr de vouloir supprimer votre compte ?')">
+		Supprimer votre compte
+		</a>  #}
+
+		<form action="{{ path('app_user_delete') }}"
+		method="post"
+		onsubmit="return confirm('Etes-vous sûr de vouloir supprimer votre compte ?')">
+
+		<input type="hidden" name"_method" value="DELETE">
+		<input type="hidden" name"_token" value="{{ csrf_token('delete_user') }}">
+		<button type="submit" class="btn btn-danger">Supprimer mon compte</button>
+
+		</form>
+
+			</div>
+		</div>
+
+	{% endblock %}

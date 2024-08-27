@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modification d'une réponse{% endblock %}
+
+{% block body %}
+
+    {% include 'home/_formResponse.html.twig' with {
+        form: formEditResponse,
+        labelButton: 'Modifier ma réponse'
+    } %}
+
+{% endblock %}

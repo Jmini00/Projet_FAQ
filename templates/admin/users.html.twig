@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs
+{% endblock %}
+
+{% block body %}
+
+	{% for message in app.flashes('success') %}
+		<div class="alert alert-success">
+			{{ message }}
+		</div>
+	{% endfor %}
+
+	{#	<ul>
+			{% for user in users %}
+				<li>
+					{{ user.nom }}
+	
+					<form action="{{ path('app_user_delete', { id: user.id }) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce compte utilisateur ?')">
+						<input type="hidden" name="_method" value="DELETE">
+						<input type="hidden" name="_token" value="{{ csrf_token('delete_user-'~ user.id) }}">
+						<button>Supprimer cet utilisateur</button>
+					</form>
+				</li> #}
+
+	<section class="py-5">
+		<div class="container px-4 px-lg-5 mt-5">
+			<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-xl-3 justify-content-center">
+				{% for user in users %}
+					<div class="card text-center" style="width: 15rem;">
+						<img src="{{ user.avatar }}" class="card-img-top" alt="{{ user.nom }}">
+						<div class="card-body">
+							<h5 class="card-title">{{ user.nom }}</h5>
+							{% if 'ROLE_ADMIN' in user.roles %}
+                            <span class=" badge rounded-pill text-bg-warning">
+                            Administrateur
+                        </span>
+                        {% endif %}
+							<p class="card-text">{{ user.email }}</p>
+							<form action="{{ path('app_user_delete', { id: user.id }) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce compte utilisateur ?')">
+								<input type="hidden" name="_method" value="DELETE">
+								<input type="hidden" name="_token" value="{{ csrf_token('delete_user-'~ user.id) }}">
+								<button class="btn btn-outline-danger">Supprimer cet utilisateur</button>
+							</form>
+
+							{# Affiche le bouton "Devenir administrateur" si l'utilisateur
+                               ne possède pas de rôle admin (ROLE_ADMIN) #}
+                        {% if 'ROLE_ADMIN' not in user.roles %}
+                            <a href="{{ path('app_admin_change_role', { id: user.id }) }}" class="btn btn-primary">
+                                Devenir administrateur
+                            </a>
+                        {% endif %}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</section>
+{% endblock %}

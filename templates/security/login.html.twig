@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+    <form method="post" class="w-50 mx-auto">
+    		<div class="text-center my-4">
+
+        <h1>Connexion</h1>
+</div>
+        {% for messageFlash in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ messageFlash }}
+            </div>
+        {% endfor %}
+
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+        <div class="mb-3 mt-5">
+            <label for="inputEmail" class="mb-2">Email</label>
+            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+        </div>
+
+        <div class="mb-3">
+            <label for="inputPassword" class="mb-2">Mot de passe</label>
+            <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+            <small>
+                <a href="{{ path('app_forgot_password_request') }}">Mot de passe oublié ?</a>
+            </small>
+        </div>
+
+        <div class="mb-4">
+            <label>
+                <input type="checkbox" name="_remember_me">
+                Se souvenir de moi
+            </label>
+        </div>
+
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+        <button class="btn btn-lg btn-primary mb-5" type="submit">
+            Se connecter
+        </button>
+    </form>
+{% endblock %}

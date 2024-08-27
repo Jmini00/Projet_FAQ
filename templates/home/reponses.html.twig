@@ -1,0 +1,174 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Question "{{ question.titre }}"
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+{% endblock %}
+{% block body %}
+    {# Message de succès #}
+	{% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+	{# Message d'erreur #}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+	<div class="container mx-auto py-5">
+		<h1>QUESTIONS REPONSES</h1>
+
+		{# Question #}
+		<ul class="list-group pt-5">
+			<li class="list-group-item p-3">
+				<h3>{{ question.titre }}</h3>
+				{% if question.contenu %}
+					<p>{{ question.contenu }}</p>
+				{% endif %}
+				<small class="text-secondary">
+					<img src="{{ asset(question.user.avatar) }}" alt="{{ question.user.nom }}" class="rounded-circle" style="width: 25px">
+					{{ question.user.nom }}
+					a posé une question le
+					{{ question.dateCreation|date('d.m.Y') }}
+
+					{# Bouton de suppression #}
+				    {% if is_granted('QUESTION_DELETE', question) %}
+
+						<form class="my-3"
+                        action="{{ path('app_home_delete', { id: question.id }) }}"
+                        method="post"
+                        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette question ?')"
+                    >
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="_token" value="{{ csrf_token('question_delete') }}">
+                        <button type="submit" class="link-danger">Supprimer cette question</button>
+                    </form>
+                {% endif %}
+
+					{# Bouton de modification #}
+                {% if is_granted('QUESTION_EDIT', question) %}
+                     <a href="{{ path('app_home_edit', { id: question.id }) }}" class="link-primary">Modifier ma question</a>
+                {% endif %}
+
+				{# Bouton de signalement #}
+                {% if is_granted('USER_ACCESS') %}
+                    <form
+                        action="{{ path('app_home_signaler', { id: question.id, type: 'question' }) }}"
+                        method="post"
+                    >
+                        <input type="hidden" name="_token" value="{{ csrf_token('report-question-'~ question.id) }}">
+                        <button type="submit" class="btn btn-danger">Signaler</button>
+                    </form>
+                {% endif %}
+
+
+				</small>
+			</li>
+		</ul>
+
+		{# Reponses #}
+		<ul class="list-group pt-5">
+			{% for reponse in question.reponses %}
+				<li
+					class="list-group-item p-3 {{ reponse.user.id is same as(question.user.id) ? 'border border-2 border-danger' : '' }}">
+					{# Affiche un badge si la réponse est celle de l'auteur de la question #}
+					{% if reponse.user.id is same as(question.user.id) %}
+						<span class="badge rounded-pill text-bg-danger mb-2">
+							Réponse de l'auteur
+						</span>
+					{% endif %}
+					<p>{{ reponse.contenu }}</p>
+					<small class="text-secondary">
+						<img src="{{ asset(reponse.user.avatar) }}" alt="{{ reponse.user.nom }}" class="rounded-circle" style="width: 25px">
+						{{ reponse.user.nom }}
+						a posté une réponse le
+						{{ reponse.dateCreation|date('d.m.Y') }}
+
+						{# Affiche la date de modification si celle-ci n'est pas null #}
+						{% if reponse.dateModification is not null %}
+						et l'a modifiée le {{ reponse.dateModification|date('d.m.Y à H:i') }}
+						{% endif %}
+
+						{# Affiche le nombre de votes qu'a recu cette reponse #}
+						- Nombre de like : {{ reponse.Voters|length }}
+						
+						{# Bouton de vote #}
+						{% if is_granted('REPONSE_VOTE', reponse) %}
+						<form class="my-3"
+                            action="{{ path('app_reponse_vote', { id: reponse.id }) }}"
+                            method="post"
+						>
+				         	<input type="hidden" name="_token" value="{{ csrf_token('vote-'~ reponse.id) }}">
+                            <button type="submit" class="btn btn-outline-warning">Liker cette réponse</button>
+							{# <button type="submit">
+                                <span class="material-symbols-outlined">favorite</span>
+                            </button> #}
+						</form>
+						{% endif %}
+
+						{# Bouton de modification avec comparaison d'objet à objet #}
+						{# Bouton de suppression #}
+                    {% if is_granted('REPONSE_DELETE', reponse) %}
+                        <form class="my-3"
+                            action="{{ path('app_reponse_delete', { id: reponse.id }) }}"
+                            method="post"
+                            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réponse ?')"
+                        >
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="_token" value="{{ csrf_token('reponse_delete-'~ reponse.id) }}">
+                            <button type="submit" class="btn btn-outline-danger">Supprimer cette réponse</button>
+                        </form>
+                    {% endif %}
+
+						{# is_granted() permet de vérifier si l'utilisateur à la permission de voir
+                        le lien de modification #}
+						{% if is_granted('REPONSE_VIEW', reponse) %}
+							<a href="{{ path('app_reponse_edit', { id: reponse.id}) }}">Modifier ma réponse</a>
+						{% endif %}
+
+						{# Bouton de signalement #}
+                    {% if is_granted('USER_ACCESS') %}
+                        <form
+                            action="{{ path('app_home_signaler', { id: reponse.id, type: 'reponse' }) }}"
+                            method="post"
+                        >
+                            <input type="hidden" name="_token" value="{{ csrf_token('report-reponse-'~ reponse.id) }}">
+                            <button type="submit" class="btn btn-danger">Signaler</button>
+                        </form>
+                    {% endif %}
+
+					</small>
+				</li>
+			{% else %}
+				<p>Aucune réponse pour le moment</p>
+			{% endfor %}
+		</ul>
+
+		{# Formulaire de réponse si l'utilisateur est connecté #}
+		{% if app.user %}
+			<div class="mt-5">
+				<h2>Postez une réponse</h2>
+				<div class="mt-3">
+					{% include 'home/_formResponse.html.twig' with {
+						form : formResponse,
+						labelButton: 'Publier ma réponse'
+					} %}
+					</div>
+				</div>
+			{% else %}
+				<p>
+					Pour poster une réponse, veuillez vous
+					<a href="{{ path('app_login') }}">connecter</a>
+					ou
+					<a href="{{ path('app_register') }}">ouvrir un compte</a>
+				</p>
+			{% endif %}
+		</div>
+
+	{% endblock %}

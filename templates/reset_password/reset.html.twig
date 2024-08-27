@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reset your password{% endblock %}
+
+{% block body %}
+<div class="w-50 mx-auto">
+    <h1>Nouveau mot de passe</h1>
+
+    <div class="mt-5">
+        {{ form(resetForm) }}
+    </div>
+</div>
+{% endblock %}

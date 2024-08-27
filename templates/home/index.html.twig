@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+    {% for messageFlash in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ messageFlash }}
+        </div>
+    {% endfor %}
+
+    <ul class="list-group">
+        {% for question in questions %}
+            <li class="list-group-item p-4 {{ question.user is same as(app.user) ? 'border border-2 border-info' : '' }}">
+                {# Affiche un badge si la question est celle de l'utilisateur connecté #}
+                {% if question.user is same as(app.user) %}
+                    <span class="badge rounded-pill text-bg-info mb-2">
+                        Votre question
+                    </span>
+                {% endif %}
+                <h5>
+                    <a href="{{ path('app_home_reponses', { id: question.id }) }}">
+                        {{ question.titre }}
+                    </a>
+                </h5>
+                {% if question.contenu %}
+                    <p>{{ question.contenu|slice(0, 50) }}...</p>
+                {% endif %}
+                <small class="text-secondary">
+                    <img
+                            src="{{ asset(question.user.avatar) }}"
+                            alt="{{ question.user.nom }}"
+                            class="rounded-circle"
+                            style="width: 25px"
+                    >
+                    {{ question.user.nom }} a posé une question
+                    le {{ question.dateCreation|date('d.m.Y') }}
+                </small>
+            </li>
+        {% else %}
+            <p>Aucune question pour le moment</p>
+        {% endfor %}
+    </ul>
+{% endblock %}
